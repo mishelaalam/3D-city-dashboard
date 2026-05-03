@@ -1,0 +1,7 @@
+[build]
+  base = "frontend"
+  command = "npm ci && npx vite build"
+  publish = "dist"
+
+[build.environment]
+  VITE_API_URL = "https://masiv-dashboard-production.up.railway.app"
