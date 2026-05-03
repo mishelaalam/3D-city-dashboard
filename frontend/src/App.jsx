@@ -22,6 +22,8 @@ import LLMPanel     from "./components/LLMPanel";
 import ProjectsPanel from "./components/ProjectsPanel";
 import BuildingPopup from "./components/BuildingPopup";
 import Legend        from "./components/Legend";
+import StatsPanel    from "./components/StatsPanel";
+import AddressSearch from "./components/AddressSearch";
 import { useStore }  from "./store/useStore";
 
 export default function App() {
@@ -37,10 +39,12 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Left sidebar */}
-        <aside className="w-72 flex-shrink-0 flex flex-col gap-3 p-3 overflow-y-auto bg-slate-900/60 z-10">
-          <LLMPanel />
-          <ProjectsPanel />
-        </aside>
+       <aside className="w-72 flex-shrink-0 flex flex-col gap-3 p-3 overflow-y-auto bg-slate-900/60 z-10">
+  <AddressSearch />
+  <LLMPanel />
+  <StatsPanel />
+  <ProjectsPanel />
+</aside>
 
         {/* 3D viewport */}
         <main className="flex-1 relative">

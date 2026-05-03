@@ -22,7 +22,7 @@ export default function Header() {
         </div>
         <div>
           <h1 className="font-bold text-white text-sm leading-tight">MASIV Urban Dashboard</h1>
-          <p className="text-slate-500 text-xs">Calgary Downtown 3D City Map</p>
+          <p className="text-slate-500 text-xs">Build by Mishela Alam</p>
         </div>
       </div>
 

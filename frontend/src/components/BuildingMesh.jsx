@@ -12,16 +12,16 @@
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 const USE_COLORS = {
-  Residential:   "#3b82f6",
-  Commercial:    "#f59e0b",
-  Office:        "#8b5cf6",
-  Hotel:         "#ec4899",
-  Industrial:    "#64748b",
-  Institutional: "#10b981",
-  Religious:     "#f97316",
-  Parking:       "#475569",
-  "Mixed Use":   "#06b6d4",
-  Retail:        "#eab308",
+  Residential:   "#ff6b6b",
+  Commercial:    "#ffd93d",
+  Office:        "#6bcb77",
+  Hotel:         "#c77dff",
+  Industrial:    "#f4845f",
+  Institutional: "#4cc9f0",
+  Religious:     "#f72585",
+  Parking:       "#6c757d",
+  "Mixed Use":   "#4361ee",
+  Retail:        "#ff9a3c",
 };
 
 export default function BuildingMesh({ building, highlighted, selected, onClick, fabricating }) {
