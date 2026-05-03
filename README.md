@@ -6,10 +6,8 @@ A full-stack web application that renders a 3D interactive map of Calgary's down
 
 ## Live Demo
 
-> **Frontend:** `https://masiv-dashboard.vercel.app`  
-> **Backend:**  `https://masiv-dashboard.railway.app`
-
-*(Update these URLs after deployment)*
+> **Frontend:** `https://incandescent-hotteok-c3018d.netlify.app`
+> **Backend:**  `https://masiv-dashboard-production.up.railway.app`
 
 ---
 
@@ -22,7 +20,9 @@ A full-stack web application that renders a 3D interactive map of Calgary's down
 | 🤖 LLM Querying | Type natural language queries — the AI interprets and highlights matching buildings |
 | 💾 Project Persistence | Save and reload named filter analyses per user (SQLite + Flask) |
 | ⚙ Fabrication Mode | Animated toolhead traces building footprints with a CatmullRom spline path |
-| 📊 UML Diagrams | Class + sequence diagrams in `docs/uml_diagram.html` |
+| 🔍 Address Search | Search buildings by address or name with live dropdown results |
+| 📊 Stats Panel | Live building type breakdown with animated bars, updates on filter |
+| 📐 UML Diagrams | Class + sequence diagrams in `docs/uml_diagram.html` |
 
 ---
 
@@ -30,7 +30,7 @@ A full-stack web application that renders a 3D interactive map of Calgary's down
 
 ### Backend
 - **Python 3.11+** with **Flask 3**
-- **Anthropic Claude** (claude-sonnet-4) for LLM query interpretation
+- **Groq API** (llama-3.1-8b-instant) for free LLM query interpretation
 - **SQLite** for user/project persistence
 - **OpenStreetMap Overpass API** for live building data (fallback: realistic seeded dataset)
 - **City of Calgary Open Data** for property assessment enrichment
@@ -59,10 +59,11 @@ masiv-dashboard/
 │   │   └── llm.py             # POST /api/llm/query
 │   ├── requirements.txt
 │   ├── Procfile               # Railway deployment
+│   ├── railway.toml           # Railway config
 │   └── .env.example
 ├── frontend/
 │   ├── src/
-│   │   ├── store/useStore.js   # Zustand global state + applyFilter()
+│   │   ├── store/useStore.js          # Zustand global state + applyFilter()
 │   │   ├── components/
 │   │   │   ├── Scene3D.jsx            # R3F canvas, lights, controls
 │   │   │   ├── BuildingMesh.jsx       # Extruded 3D building
@@ -70,15 +71,17 @@ masiv-dashboard/
 │   │   │   ├── LLMPanel.jsx           # AI query input
 │   │   │   ├── ProjectsPanel.jsx      # Save/load projects
 │   │   │   ├── BuildingPopup.jsx      # Building detail panel
+│   │   │   ├── AddressSearch.jsx      # Address/name search bar
+│   │   │   ├── StatsPanel.jsx         # Live building type stats
 │   │   │   ├── Header.jsx
 │   │   │   └── Legend.jsx
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── package.json
-│   ├── vite.config.js
-│   └── vercel.json
+│   └── vite.config.js
+├── netlify.toml               # Netlify deployment config
 └── docs/
-    └── uml_diagram.html        # Class + sequence UML diagrams
+    └── uml_diagram.html       # Class + sequence UML diagrams
 ```
 
 ---
@@ -88,7 +91,7 @@ masiv-dashboard/
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/yourusername/masiv-dashboard.git
+git clone https://github.com/mishelaalam/masiv-dashboard.git
 cd masiv-dashboard
 ```
 
@@ -105,12 +108,14 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Configure environment
-cp .env.example .env
-# Edit .env and set your ANTHROPIC_API_KEY (see "Getting an API Key" below)
+copy .env.example .env          # Windows
+# cp .env.example .env          # Mac/Linux
+
+# Edit .env and set your GROQ_API_KEY (see "Getting an API Key" below)
 
 # Run the Flask server
 python app.py
-# → API available at http://localhost:5000
+# API available at http://localhost:5000
 ```
 
 ### 3. Frontend setup
@@ -123,7 +128,7 @@ npm install
 
 # Run development server
 npm run dev
-# → App available at http://localhost:5173
+# App available at http://localhost:5173
 ```
 
 The Vite dev server proxies `/api/*` to Flask on port 5000, so no CORS issues locally.
@@ -132,39 +137,18 @@ The Vite dev server proxies `/api/*` to Flask on port 5000, so no CORS issues lo
 
 ## Getting an API Key
 
-### Anthropic (Claude) API Key — Required for LLM queries
+### Groq API Key — Required for LLM queries (free, no credit card needed)
 
-1. Visit [console.anthropic.com](https://console.anthropic.com)
-2. Sign up / log in
-3. Go to **API Keys** → **Create Key**
+1. Visit [console.groq.com](https://console.groq.com)
+2. Sign up / log in (completely free)
+3. Go to **API Keys** → **Create API Key**
 4. Copy the key and set it in `backend/.env`:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GROQ_API_KEY=gsk_...
 ```
 
-The free tier includes a small credit on signup. LLM queries in this app use ~100 tokens each (very cheap).
-
----
-
-## Deployment
-
-### Backend → Railway
-
-1. Push your code to GitHub
-2. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub**
-3. Select the `backend/` directory (or set root directory in Railway settings)
-4. Add environment variable: `ANTHROPIC_API_KEY=sk-ant-...`
-5. Railway auto-detects the `Procfile` and deploys with gunicorn
-6. Copy the generated URL (e.g. `https://masiv-dashboard.railway.app`)
-
-### Frontend → Vercel
-
-1. Go to [vercel.com](https://vercel.com) → **New Project** → import your repo
-2. Set **Root Directory** to `frontend`
-3. Add environment variable: `VITE_API_URL=https://masiv-dashboard.railway.app/api`
-4. Edit `frontend/vercel.json` to point rewrites to your Railway URL
-5. Deploy — Vercel auto-runs `npm run build`
+Groq's free tier allows 14,400 requests/day
 
 ---
 
@@ -184,18 +168,23 @@ The free tier includes a small credit on signup. LLM queries in this app use ~10
 "residential built before 1980"
 "show buildings worth less than $500,000"
 "office towers with more than 20 floors"
-"reset"  ← clears all filters
+"reset"  <- clears all filters
 ```
 
+### Address Search
+- Type any street name or building name in the search bar
+- Results appear in a dropdown instantly
+- Click a result to select and highlight that building
+
 ### Saving Projects
-1. Enter a username in the **Sign In** panel
-2. Run an AI query — matched buildings are highlighted in yellow
-3. Enter a project name → click **Save**
+1. Enter a username in the Sign In panel
+2. Run an AI query — matched buildings highlight yellow
+3. Enter a project name and click Save
 4. Click any saved project to re-apply its filter
 
 ### Fabrication Mode
 1. Optionally run an AI query to filter buildings first
-2. Click **⚙ Fabrication Mode** in the header
+2. Click Fabrication Mode in the header
 3. A cyan toolhead animates along the footprints of matched buildings
 4. The traced path glows cyan; ghost path shows upcoming trajectory
 5. Click again to stop
@@ -208,17 +197,19 @@ The free tier includes a small credit on signup. LLM queries in this app use ~10
 |---|---|---|
 | OpenStreetMap | Building footprints, heights, addresses | Overpass API (free) |
 | City of Calgary | Property assessments, zoning | data.calgary.ca (free) |
-| Seed data | ~80 realistic Calgary downtown buildings | Built-in fallback |
+| Seed data | ~500 realistic Calgary downtown buildings | Built-in fallback |
 
-The seed dataset covers the Beltline / Downtown Core / East Village area bounded by approximately 6 Ave – 12 Ave SW and Centre St – 4 St SW.
+The seed dataset covers the Beltline / Downtown Core / East Village area bounded by approximately 6 Ave SW – 12 Ave SW and Centre St – 4 St SW.
 
 ---
 
 ## Architecture Notes
 
 - **LLM filtering is entirely client-side**: The LLM only receives the user's text query and returns a structured JSON filter schema. Building data is never sent to the LLM — keeping latency low and data private.
-- **Building geometry**: Footprints are stored as local-metre XZ coordinates (flat-earth projection from the area centroid). Three.js `ExtrudeGeometry` extrudes them by `height_m`.
-- **Fabrication toolpath**: A `CatmullRomCurve3` is fitted through all footprint vertices of selected buildings. A sphere mesh is animated via `useFrame()` along `curve.getPoint(t)`.
+- **Building geometry**: Footprints are stored as local-metre XZ coordinates (flat-earth projection from the area centroid). Three.js ExtrudeGeometry extrudes them by height_m.
+- **Fabrication toolpath**: A CatmullRomCurve3 is fitted through all footprint vertices of selected buildings. A sphere mesh is animated via useFrame() along curve.getPoint(t).
+- **Stats panel**: Counts update reactively via useMemo whenever the active filter changes — no extra API calls needed.
+- **Address search**: Pure client-side substring match against the loaded building dataset — instant results with no backend involvement.
 
 ---
 
