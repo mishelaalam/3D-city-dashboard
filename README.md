@@ -205,11 +205,11 @@ The seed dataset covers the Beltline / Downtown Core / East Village area bounded
 
 ## Architecture Notes
 
-- **LLM filtering is entirely client-side**: The LLM only receives the user's text query and returns a structured JSON filter schema. Building data is never sent to the LLM — keeping latency low and data private.
+- **LLM filtering is entirely client-side**: The LLM only receives the user's text query and returns a structured JSON filter schema. Building data is never sent to the LLM,keeping latency low and data private.
 - **Building geometry**: Footprints are stored as local-metre XZ coordinates (flat-earth projection from the area centroid). Three.js ExtrudeGeometry extrudes them by height_m.
 - **Fabrication toolpath**: A CatmullRomCurve3 is fitted through all footprint vertices of selected buildings. A sphere mesh is animated via useFrame() along curve.getPoint(t).
-- **Stats panel**: Counts update reactively via useMemo whenever the active filter changes — no extra API calls needed.
-- **Address search**: Pure client-side substring match against the loaded building dataset — instant results with no backend involvement.
+- **Stats panel**: Counts update reactively via useMemo whenever the active filter changes, no extra API calls needed.
+- **Address search**: Pure client-side substring match against the loaded building dataset, instant results with no backend involvement.
 
 ---
 ## Architecture & Design Decisions
