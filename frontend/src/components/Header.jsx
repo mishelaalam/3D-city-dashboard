@@ -21,7 +21,7 @@ export default function Header() {
           M
         </div>
         <div>
-          <h1 className="font-bold text-white text-sm leading-tight">MASIV Urban Dashboard</h1>
+          <h1 className="font-bold text-white text-sm leading-tight">3D City Map Dashboard</h1>
           <p className="text-slate-500 text-xs">Build by Mishela Alam</p>
         </div>
       </div>
