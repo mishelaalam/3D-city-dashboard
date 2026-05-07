@@ -1,4 +1,4 @@
-# MASIV Calgary 3D Urban Design Dashboard
+# Calgary 3D Urban Design Dashboard
 
 A full-stack web application that renders a 3D interactive map of Calgary's downtown buildings, supports natural language querying via an LLM, and includes a fabrication/toolpath animation mode.
 
